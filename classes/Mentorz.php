@@ -3,10 +3,11 @@
 	add_action( 'admin_menu', 'mentorz_plugin_menu' );
 
 	function mentorz_plugin_menu() {
-		add_menu_page( "Mentorz Adminstration", "Mentorz", 'manage_options', 'mentorz', 'mentorz_plugin_options' );
+		add_menu_page( "Mentorz Administration", "Mentorz", 'manage_options', 'mentorz', 'mentorz_plugin_options' );
 		add_submenu_page( 'mentorz', 'Installation', 'Installation Guidelines', 'manage_options', 'mentorz_installation', 'mentorz_insallation_page' );
 
-		add_submenu_page( 'mentorz', 'Groups', 'Groups Adminstration', 'manage_options', 'mentorz_groups', 'mentorz_groups_page' );
+		add_submenu_page( 'mentorz', 'Groups', 'Groups Administration', 'manage_options', 'mentorz_groups', 'mentorz_groups_page' );
+		add_submenu_page( 'mentorz', 'Users', 'Users Administration', 'manage_options', 'mentorz_userss', 'mentorz_users_page' );
 	}
 
 
@@ -20,11 +21,24 @@
 	}
 
 	function mentorz_groups_page(){
-		mz_pages::groups_page();
+		
+
+		if ( $_GET['edit'] ){
+			mz_Pages::groups_edit_page( $_GET['edit'] );
+		} elseif ( $_GET['del'] ) {
+			mz_Pages::groups_delete_page( $_GET['del'] );
+		} else {
+			mz_pages::groups_page();
+		}
+	}
+
+	function mentorz_users_page(){
+		mz_Pages::users_page();
 	}
 
 
-	## Add the roles were going to use.
+
+	## Add the roles we're going to use.
 	add_role( 'mentor' , "Mentor"  );
 	add_role( 'student' , "Student" );
 
@@ -40,6 +54,10 @@
 	if ( ! mz_Func::check_if_installed() ){
 		mz_Func::install_it_then();
 	}
+
+
+
+	
 
 
 
