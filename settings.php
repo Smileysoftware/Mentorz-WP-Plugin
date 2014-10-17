@@ -10,5 +10,8 @@ define('USER_GROUPS_DB_TABLE' , 'mentorz_user_groups');
 
 require_once( CLASSES_DIR . '/' . 'Functions.php');
 require_once( CLASSES_DIR . '/' . 'Mentorz.php');
+require_once( CLASSES_DIR . '/' . 'Groups.php');
+require_once( CLASSES_DIR . '/' . 'Users.php');
 require_once( CLASSES_DIR . '/' . 'Pages.php');
 require_once( CLASSES_DIR . '/' . 'Generator.php');
+

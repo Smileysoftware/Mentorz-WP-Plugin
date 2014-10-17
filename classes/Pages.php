@@ -83,7 +83,7 @@ class mz_Pages{
 			//Do a bit of validation
 			if ( ! $_POST['mz_group_name'] ){
 				$error = 'You must fill in the form';
-				Self::newGroupForm( $error );
+				mz_Groups::newGroupForm( $error );
 			} else {
 				//Make the update
 				$mz_group_name = esc_sql( stripslashes( $_POST['mz_group_name'] ) );
@@ -98,7 +98,7 @@ class mz_Pages{
 		echo '<h2>Mentorz - Group Administration</h2>';
 
 		//Generate the form
-		Self::newGroupForm();
+		mz_Groups::newGroupForm();
 
 		global $wpdb;
 		$results = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . GROUPS_DB_TABLE , ARRAY_A);
@@ -157,91 +157,11 @@ class mz_Pages{
 
 
 
-	/**
-	 * Displays the new group form
-	 */
-	private static function newGroupForm( $error = null)
-	{
-		//New group form
-		echo '<h3>Add a new group</h3>';
-
-		if ( $error ){
-			echo '<div class="error"><p>';
-		         _e( $error );
-		    echo '</p></div>';
-		}
-
-		echo '<form action="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '" method="post">';
-		echo '<label for="mz_group_name">Group Name</label> ';
-		echo '<input type="text" class="regular-text" id="mz_group_name" name="mz_group_name" placeholder="Group Name">';
-		echo '<input type="submit" value="Add New" class="button button-primary"/>';
-		echo '</fomr>';
-	}
-
 	
 
 
 
 
-	/**
-	 * Group edit page
-	 */
-	public static function groups_edit_page( $groupID )
-	{
-
-		global $wpdb;
-
-		echo '<h3>Edit a group</h3>';
-
-		//Sanity check
-		if ( ! $groupID ){
-
-			echo '<div class="error"><p>';
-		         _e( 'It looks like there was a problem' );
-		    echo '</p></div>';
-
-			exit();
-		}
-
-		//Update on submit
-		if ( $_POST ){
-
-			echo '<div class="updated"><p>';
-		         _e( 'Group name saved' );
-		    echo '</p></div><br/>';
-
-			$update = $wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . GROUPS_DB_TABLE . ' SET groupname = %s	WHERE groupid = ' . $groupID, $_POST['mz_group_name'] ) );
-
-		}
-
-		//Get the data for the ID passed
-		$data = $wpdb->get_row('SELECT * FROM ' . $wpdb->prefix . GROUPS_DB_TABLE . ' WHERE groupid = ' . $groupID, ARRAY_A);
-
-		echo '<form action="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '" method="post">';
-			echo '<label for="mz_group_name">Group Name</label> ';
-			echo '<input type="text" class="regular-text" id="mz_group_name" name="mz_group_name" value="' . $data['groupname'] . '">';
-			echo '<input type="submit" value="Add New" class="button button-primary"/>';
-		echo '</fomr>';
-
-	}
-
-
-	/**
-	 * Delete the group
-	 */
-	public static function groups_delete_page( $groupID )
-	{
-		global $wpdb;
-
-		$wpdb->delete( $wpdb->query( 'DELETE FROM ' . $wpdb->prefix . GROUPS_DB_TABLE . ' WHERE groupid = ' . $groupID ) );
-
-		echo '<div class="updated"><p>';
-	         _e( 'Group deleted' );
-	    echo '</p></div><br/>';
-
-		$back = $_SERVER['HTTP_REFERER'];
-		echo '<a href="' . $back . '" class="button">Back</a>';
-	}
 
 
 
@@ -250,17 +170,74 @@ class mz_Pages{
 		echo '<div class="wrap">';
 		echo '<h2>Mentorz - Users Administration</h2>';
 
-		$blogusers = get_users( 'orderby=nicename&role=student' );
-
-		var_dump($blogusers);
-		// Array of WP_User objects.
-		foreach ( $blogusers as $user ) {
-			echo '<span>' . esc_html( $user->user_email ) . esc_html( $user->ID ) . '</span><br/>';
+		//Detect new mentor being set
+		if ( isset( $_POST['mentorID'] ) ){
+			//A new mentor has been setup
+			if ( mz_Users::updateMentor( $_POST['groupID'] , $_POST['mentorID'] ) ){
+				echo '<div class="updated"><p>';
+			         _e( 'Mentor added to group' );
+			    echo '</p></div><br/>';
+			} else {
+				echo '<div class="error"><p>';
+			         _e( 'Mentor not added to group' );
+			    echo '</p></div><br/>';
+			}
 		}
+
+		//Get a list of groups so I can display an accordion
+		global $wpdb;
+		$results = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . GROUPS_DB_TABLE , ARRAY_A );
+
+		if ( $results ){
+
+			echo '<ul class="mz_accordion">';
+
+			foreach ($results as $result) {
+
+				echo '<li class="mz_accordion_group_' . $result['groupid'] . '">';
+
+					echo '<h3>' . $result['groupname'] . '</h3>';
+
+					echo '<div class="mz_accordion_item mz_accordion_group_' . $result['groupid'] . '_inner">';
+
+						mz_Users::mentorsForm( $result['groupid'] );
+
+						$usersForm = mz_Users::usersForm( $result['groupid'] );
+
+						echo $usersForm;
+
+							//Generate a list of all the users in this group
+						mz_Users::usersInGroup( $result['groupid'] );
+
+						echo $usersForm;
+
+						echo '<hr/>';
+
+
+					echo '</div>';
+
+					
+
+				echo '</li>';
+
+			}
+
+			echo '</ul>';
+
+		} else {
+			echo '<h3>There are no groups yet</h3>';
+			echo '<p>Please add groups in the Groups Administration page</p>';
+		}
+		
+
+		
 
 		echo '</div>';
 	}
 
+
+
+	
 
 
 

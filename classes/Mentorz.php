@@ -24,9 +24,9 @@
 		
 
 		if ( $_GET['edit'] ){
-			mz_Pages::groups_edit_page( $_GET['edit'] );
+			mz_Groups::groups_edit_page( $_GET['edit'] );
 		} elseif ( $_GET['del'] ) {
-			mz_Pages::groups_delete_page( $_GET['del'] );
+			mz_Groups::groups_delete_page( $_GET['del'] );
 		} else {
 			mz_pages::groups_page();
 		}
@@ -57,7 +57,22 @@
 
 
 
-	
+	add_action('init','load_js');
+	function load_js() {
+		wp_enqueue_script( 'script', plugins_url( '/mentorz/js/script.js' ));
+	}
+
+	// function my_scripts_method() {
+	// 	wp_enqueue_script(
+	// 		'script',
+	// 		plugins_url( 'js/script.js' , dirname(__FILE__) ),
+	// 		array( 'jquery' ),
+	// 		null,
+	// 		true
+	// 	);
+	// }
+
+	// add_action( 'wp_enqueue_scripts', 'my_scripts_method' );
 
 
 

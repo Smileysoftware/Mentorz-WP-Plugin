@@ -49,6 +49,7 @@ class mz_Func
 			  	usergroupid int(11) NOT NULL AUTO_INCREMENT,
 				userid int(11),
 				groupid int(11),
+				mentor int(1),
 				UNIQUE KEY usergroupid (usergroupid)
 			);
 		';
