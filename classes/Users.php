@@ -15,7 +15,16 @@ class mz_Users{
 
 		//Get the mentor for this group
 		$the_mentor = $wpdb->get_row('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' where groupid="' . $groupID . '" and mentor="1" ');
-		
+
+        //If there is a mentor set then get their name and show it.
+        if ( $the_mentor ){
+            $user_info = get_userdata( $the_mentor->userid );
+            echo '<h4>The current mentor is ' . $user_info->user_login . ' </h4>';
+        } else {
+            echo '<h4>There is no mentor set for this group</h4>';
+        }
+
+
 		echo '<form action="" method="post">';
 
 			echo '<select name="mentorID">';
@@ -65,6 +74,29 @@ class mz_Users{
 		return false;
 
 	}
+
+
+    /**
+     * @param $groupID
+     * @param $userID
+     * @return bool
+     */
+    public function updateUser( $groupID, $userID ){
+
+        global $wpdb;
+
+        if ( $groupID && $userID )
+        {
+
+            //Now add the new mentor to this group.
+            $ins = $wpdb->query('INSERT INTO ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' ( userid , groupid, mentor ) VALUES ("' . $userID . '" , "'. $groupID . '" , "0") ');
+
+            return true;
+        }
+
+        return false;
+
+    }
 
 
 

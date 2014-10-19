@@ -24,9 +24,9 @@ class mz_Pages{
 	}
 
 
-	/**
-	 * Displays the installation page
-	 */
+    /**
+     * Displays the installation page
+     */
 	public static function installation_page()
 	{
 		mz_Func::user_has_access();
@@ -153,24 +153,15 @@ class mz_Pages{
 	} //func
 
 
-
-
-
-
-	
-
-
-
-
-
-
-
+    /**
+     * Displays the users page and handles post, edit and delete
+     */
 	public static function users_page()
 	{
 		echo '<div class="wrap">';
 		echo '<h2>Mentorz - Users Administration</h2>';
 
-		//Detect new mentor being set
+		//If a mentor is being set the post var will be mentorID
 		if ( isset( $_POST['mentorID'] ) ){
 			//A new mentor has been setup
 			if ( mz_Users::updateMentor( $_POST['groupID'] , $_POST['mentorID'] ) ){
@@ -184,6 +175,20 @@ class mz_Pages{
 			}
 		}
 
+        //If a new user is being added the post var will be userID
+        if ( isset( $_POST['userID'] ) ){
+            //A new mentor has been setup
+            if ( mz_Users::updateUser( $_POST['groupID'] , $_POST['userID'] ) ){
+                echo '<div class="updated"><p>';
+                _e( 'Student added to group' );
+                echo '</p></div><br/>';
+            } else {
+                echo '<div class="error"><p>';
+                _e( 'Student not added to group' );
+                echo '</p></div><br/>';
+            }
+        }
+
 		//Get a list of groups so I can display an accordion
 		global $wpdb;
 		$results = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . GROUPS_DB_TABLE , ARRAY_A );
@@ -196,7 +201,7 @@ class mz_Pages{
 
 				echo '<li class="mz_accordion_group_' . $result['groupid'] . '">';
 
-					echo '<h3>' . $result['groupname'] . '</h3>';
+					echo '<h3>' . $result['groupname'] . '<small>Click to expand</small></h3>';
 
 					echo '<div class="mz_accordion_item mz_accordion_group_' . $result['groupid'] . '_inner">';
 
@@ -207,7 +212,7 @@ class mz_Pages{
 						echo $usersForm;
 
 							//Generate a list of all the users in this group
-						mz_Users::usersInGroup( $result['groupid'] );
+						    mz_Users::usersInGroup( $result['groupid'] );
 
 						echo $usersForm;
 
@@ -228,9 +233,6 @@ class mz_Pages{
 			echo '<h3>There are no groups yet</h3>';
 			echo '<p>Please add groups in the Groups Administration page</p>';
 		}
-		
-
-		
 
 		echo '</div>';
 	}
