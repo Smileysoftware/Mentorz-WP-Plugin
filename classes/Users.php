@@ -81,7 +81,7 @@ class mz_Users{
      * @param $userID
      * @return bool
      */
-    public function updateUser( $groupID, $userID ){
+    public static function updateUser( $groupID, $userID ){
 
         global $wpdb;
 
@@ -109,24 +109,26 @@ class mz_Users{
 		global $wpdb;
 		$out = '';
 
-		//Get the full list of mentors.
-		$mentors = get_users( 'orderby=nicename&role=student' );
+		//Get the full list of students.
+		$students = get_users( 'orderby=nicename&role=student' );
 
-		//Get the mentor for this group
-		//$the_mentor = $wpdb->get_row('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' where groupid="' . $groupID . '" and mentor="1" ');
-		
+		//Some way to resrtict the select to a list of people not already in the group.
+		//$alreadyMembers = $wpdb->get_results('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE groupid = ' . $groupID . ' and mentor != 1', ARRAY_A);
+		$alreadyMembers = $wpdb->get_results('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE  mentor != 1', ARRAY_A);
+		foreach ($alreadyMembers as $member) {
+			$already[] = $member['userid'];
+		}
+				
 		$out.= '<form action="" method="post">';
 
 			$out.= '<select name="userID">';
 				$out.= '<option>Select</option>';
-				foreach ( $mentors as $mentor ) {
+				foreach ( $students as $student ) {
 
-					// if ( $the_mentor->userid == $mentor->ID ){
-					// 	echo '<option value="' . $mentor->ID . '" selected>' . $mentor->display_name . '</option>';
-					// } else {
-						$out.= '<option value="' . $mentor->ID . '">' . $mentor->display_name . '</option>';
-					// }
-					
+					if ( ! in_array( $student->ID , $already ) ){
+						$out.= '<option value="' . $student->ID . '">' . $student->display_name . '</option>';
+					}
+										
 				}
 			$out.= '</select>';
 			$out.= '<input type="hidden" value="' . $groupID . '" name="groupID"/>';
@@ -161,7 +163,6 @@ class mz_Users{
 					</thead>';
 
 		//Create a new array with just the user IDs
-		//$userIDs = array();
 		foreach ( $usersInGroup as $userInGroup ){
 
 			foreach ($users as $user) {
@@ -169,7 +170,16 @@ class mz_Users{
 				
 			
 				if ( $userInGroup['userid'] == $user->ID ){
-					echo '<tr><td>' . $user->display_name . '</td><td>' . $user->user_email . '</td></tr>';
+					echo '<tr><td>';
+					echo $user->display_name;
+					echo '</td><td>';
+					echo $user->user_email;
+
+					echo '<td style="width: 30px;">';
+							echo '<a href="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '&del='.$userInGroup['userid'].'&groupID='.$groupID.'" class="">DELETE</a>';
+						echo '</td>';
+
+					echo '</tr>';
 				}
 
 				
@@ -181,6 +191,31 @@ class mz_Users{
 		echo '</tbody></table>';
 
 	}
+
+
+
+	public static function users_delete_page( $groupID , $userID ){
+
+		if( $groupID && $userID ){
+
+			global $wpdb;
+
+			//Make sure to remove all mentorz for this group
+			$wpdb->delete( $wpdb->prefix . USER_GROUPS_DB_TABLE , array( 'groupid' => $groupID , 'userid' => $userID ) );
+
+			echo '<div class="updated"><p>';
+		         _e( 'User removed from group' );
+		    echo '</p></div><br/>';
+
+			$back = $_SERVER['HTTP_REFERER'];
+			echo '<a href="' . $back . '" class="button">Back</a>';
+
+		}
+
+	}
+
+
+
 
 
 }

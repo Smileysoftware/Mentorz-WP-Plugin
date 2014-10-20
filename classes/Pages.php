@@ -16,10 +16,31 @@ class mz_Pages{
 
 		echo '<h2>Mentorz</h2>';
 
-		echo '<p>Here is where the form would go if I actually had options.</p>';
-		echo '</div>';
+		echo '<h3>Welcome to the Mentorz plugin</h3>';
+		echo '
+			<p>
+			In this plugin you can manage groups and assign mentors ans students to each group.
+			</p>
 
-		echo plugins_url();
+			<h4>Users</h4>
+			<p>
+			To add users simply add them to WordPress in the usual manner.<br/>
+			Each user must be assigned a "role", you will find that there are two new role called "Mentor" and "Student".<br/>
+			Ensure that users have the correct role.
+			</p>
+
+			<h4>Groups</h4>
+			<p>
+			In the "Groups Administration page you can add edit and delete groups."
+			</p>
+
+			<h4>Assigning mentors and users</h4>
+			<p>
+				In the "Users Administration" page you can add mentors and users to the proper group.
+				Each mentor group should have a mentor and students assigned to it.<br/>
+			</p>
+			';
+		echo '</div>';
 
 	}
 
@@ -39,10 +60,14 @@ class mz_Pages{
 				<p>Installation.</p>
 				<p>Create three pages.</p>
 				<ol>
-					<li>/inbox</li>
-					<li>/inbox/create</li>
-					<li>/inbox/show</li>
+					<li>/'.PLUGIN_ROOT_PAGE.'</li>
+					<li>/'.PLUGIN_CREATE_PAGE.'</li>
+					<li>/'.PLUGIN_READ_PAGE.'</li>
 				</ol>
+
+				<p>
+				These pages can be modified in settings if required.
+				</p>
 
 				<h3>Users</h3>
 				<p>The system uses two types of user.</p>

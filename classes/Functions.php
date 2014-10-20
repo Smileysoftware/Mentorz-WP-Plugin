@@ -73,5 +73,25 @@ class mz_Func
 
 	}
 
+	public static function get_current_user_role () {
+	    
+	    global $current_user;
+	    get_currentuserinfo();
+	    $user_roles = $current_user->roles;
+	    $user_role = array_shift($user_roles);
+
+	    return $user_role;
+	}
+
+	public static function get_current_users_group( $userID ){
+
+		global $wpdb;
+
+		$groupID = $wpdb->get_row('SELECT DISTINCT groupid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE userid = '.$userID);
+
+		return $groupID;
+
+	}
+
 
 }
