@@ -53,8 +53,13 @@
     /**
      *  Add the roles we're going to use.
      */
-	add_role( 'mentor' , "Mentor"  );
-	add_role( 'student' , "Student" );
+	add_role( 'mentor' , "Mentor" , array(
+        'read' => true, 'edit_posts' => false, 'delete_posts' => false,  ) );
+	add_role( 'student' , "Student" , array(
+        'read' => true, 'edit_posts' => false, 'delete_posts' => false,  ) );
+
+//    remove_role( 'mentor' );
+//    remove_role( 'student' );
 
 
     /**
@@ -65,8 +70,19 @@
 	{
 		mz_Generator::mentorz_inbox_block();
 	}
+    add_shortcode( 'mentorz_create', 'mentorz_create_block' );
+    function mentorz_create_block()
+    {
+        mz_Generator::mentorz_create_block();
+    }
+    add_shortcode( 'mentorz_show', 'mentorz_show_block' );
+    function mentorz_show_block()
+    {
+        mz_Generator::mentorz_show_block();
+    }
 
-    /**
+
+        /**
      * If the system is not installed, well, install it.
      */
 	if ( ! mz_Func::check_if_installed() ){

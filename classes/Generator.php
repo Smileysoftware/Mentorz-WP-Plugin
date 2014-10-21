@@ -5,44 +5,107 @@ class mz_Generator{
 	public static function mentorz_inbox_block()
 	{
 
-		auth_redirect();
-
 		//Get the users ID
 		$userID = get_current_user_id();
 
-		//get the current users status
-		$userRols = mz_Func::get_current_user_role();
+        if ( $userID ){
 
-		// Get the users group
-		$groupID = mz_Func::get_current_users_group( $userID );
+            //get the current users status
+            $userRoles = mz_Func::get_current_user_role();
+            if ( $userRoles == 'mentor' || $userRoles == 'student' ){
 
-echo $groupID;
+                // Get the users group
+                $groupID = mz_Func::get_current_users_group( $userID );
+                if ( $groupID ){
 
-		echo '
-			<table class="widefat">
-			<thead>
-			    <tr>
-			        <th>RegId</th>
-			        <th>Name</th>       
-			        <th>Email</th>
-			    </tr>
-			</thead>
-			<tfoot>
-			    <tr>
-			    <th>RegId</th>
-			    <th>Name</th>
-			    <th>Email</th>
-			    </tr>
-			</tfoot>
-			<tbody>
-			   <tr>
-			     <td><?php echo $regid; ?></td>
-			     <td><?php echo $name; ?></td>
-			     <td><?php echo $email; ?></td>
-			   </tr>
-			</tbody>
-			</table>
-		';
+                    echo '<section class="mz_inbox">';
+
+                        Self::toolbar();
+
+                        $siteURL = get_site_url();
+
+
+                        //All went well, lets rock !
+                        echo '
+                            <table class="widefat mz_inbox_table">
+                            <thead>
+                                <tr>
+                                    <th>Date / Time</th>
+                                    <th>From</th>
+                                    <th>Subject</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Date / Time</th>
+                                    <th>From</th>
+                                    <th>Subject</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                               <tr>
+                                 <td><a href="'.get_site_url().'/'.PLUGIN_READ_PAGE.'&mz_msg=12">10th Oct 14</a></td>
+                                 <td>Random User</td>
+                                 <td>This is the subject line</td>
+                                 <td><a href="">Delete</a></td>
+                               </tr>
+                               <tr>
+                                 <td>10th Oct 14</td>
+                                 <td>Random User</td>
+                                 <td>This is the subject line</td>
+                                 <td><a href="">Delete</a></td>
+                               </tr>
+                            </tbody>
+                            </table>
+                        ';
+
+                    echo '</section>';
+
+                } else {
+
+                    echo '<strong>You must be assigned to a group</strong>';
+
+                }
+
+            }  else {
+
+                echo '<strong>You are not assigned a proper user</strong>';
+
+            }  //if userroles
+
+        }// if userid
+
+
+
+
+
+
+
 	}
+
+
+    public static function mentorz_create_block()
+    {
+        echo 'Form';
+    }
+
+
+
+    public static function mentorz_show_block()
+    {
+        echo 'Message view';
+        echo 'ID is ' . $_GET['mz_msg'];
+    }
+
+
+
+
+
+    private function toolbar()
+    {
+        echo '<a href="'.get_site_url().'/'.PLUGIN_CREATE_PAGE.'" class="mz_button">Write a message</a>';
+    }
 
 }
