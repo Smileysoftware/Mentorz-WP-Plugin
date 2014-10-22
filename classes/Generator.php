@@ -20,7 +20,7 @@ class mz_Generator{
 
                     echo '<section class="mz_inbox">';
 
-                        Self::toolbar();
+                        mz_Generator::toolbar();
 
                         $siteURL = get_site_url();
 
