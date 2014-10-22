@@ -9,7 +9,4 @@
  * License: Not sur
  */
 
-
-//http://www.onextrapixel.com/2009/07/01/how-to-design-and-style-your-wordpress-plugin-admin-panel/
-
 require_once( 'settings.php' );

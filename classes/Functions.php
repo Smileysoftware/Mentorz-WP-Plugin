@@ -56,7 +56,7 @@ class mz_Func
 		dbDelta($sql);
 
 		#Create the flag file
-		Self::create_installed_flag_file();
+		mz_Func::create_installed_flag_file();
 
 	}
 
