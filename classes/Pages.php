@@ -20,9 +20,9 @@ class mz_Pages{
 		echo '
 			<p>
 			In this plugin you can manage groups and assign mentors ans students to each group.
-			</p>
+			</p>';
 
-			<h4>Users</h4>
+		echo '<h4>Users</h4>
 			<p>
 			To add users simply add them to WordPress in the usual manner.<br/>
 			Each user must be assigned a "role", you will find that there are two new role called "Mentor" and "Student".<br/>
@@ -40,6 +40,15 @@ class mz_Pages{
 				Each mentor group should have a mentor and students assigned to it.<br/>
 			</p>
 			';
+
+		echo '<h2>Plugin Version</h2>';
+		echo '<p>The current plugin version is <strong>'.VERSION.'</strong></p>';
+
+		echo '<p>'.VERSION_LOG.'</p>';
+
+
+
+
 		echo '</div>';
 
 	}
