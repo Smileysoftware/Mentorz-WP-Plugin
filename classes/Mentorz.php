@@ -98,5 +98,14 @@
 		wp_enqueue_script( 'script', plugins_url( '/mentorz/js/script.js' ));
 	}
 
+    /**
+     * Send the pesky user to the inbox page. Get that page from settings
+     */
+    add_filter( 'login_redirect', 'upon_login_redirect' );
+    function upon_login_redirect( ) {
+        return PLUGIN_ROOT_PAGE;
+    }
+
+
 
 
