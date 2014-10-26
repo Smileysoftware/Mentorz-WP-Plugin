@@ -41,7 +41,7 @@
 
 	function mentorz_users_page(){
 
-        if( $_GET['del'] ){
+        if( isset( $_GET['del'] ) ){
             mz_Users::users_delete_page( $_GET['groupID'], $_GET['del'] );
         } else {
             mz_Pages::users_page();

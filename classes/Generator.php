@@ -20,7 +20,7 @@ class mz_Generator{
 
                     echo '<section class="mz_inbox">';
 
-                        Self::toolbar();
+                        mz_Generator::toolbar();
 
                         $siteURL = get_site_url();
 
@@ -52,7 +52,7 @@ class mz_Generator{
                                  <td><a href="">Delete</a></td>
                                </tr>
                                <tr>
-                                 <td>10th Oct 14</td>
+                                 <td><a href="'.add_query_arg( 'mz_msg', '12', get_site_url().'/'.PLUGIN_READ_PAGE ).'">10th Oct 14</a></td>
                                  <td>Random User</td>
                                  <td>This is the subject line</td>
                                  <td><a href="">Delete</a></td>
@@ -103,7 +103,7 @@ class mz_Generator{
 
 
 
-    private function toolbar()
+    private static function toolbar()
     {
         echo '<a href="'.get_site_url().'/'.PLUGIN_CREATE_PAGE.'" class="mz_button">Write a message</a>';
     }
