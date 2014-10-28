@@ -30,9 +30,9 @@
 
 	function mentorz_groups_page(){
 
-		if ( $_GET['edit'] ){
+		if ( isset( $_GET['edit'] ) ){
 			mz_Groups::groups_edit_page( $_GET['edit'] );
-		} elseif ( $_GET['del'] ) {
+		} elseif ( isset( $_GET['del'] ) ){
 			mz_Groups::groups_delete_page( $_GET['del'] );
 		} else {
 			mz_pages::groups_page();

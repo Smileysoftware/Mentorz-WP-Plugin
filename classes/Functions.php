@@ -55,6 +55,20 @@ class mz_Func
 		';
 		dbDelta($sql);
 
+        $table_name = $wpdb->prefix . MESSAGES_DB_TABLE;
+        $sql = '
+			CREATE TABLE IF NOT EXISTS ' . $table_name . ' (
+			  	messageid int(11) NOT NULL AUTO_INCREMENT,
+				messageto int(11),
+				messagefrom int(11),
+				subject varchar(200),
+				body varchar(999),
+				stamp varchar(100),
+				UNIQUE KEY messageid (messageid)
+			);
+		';
+        dbDelta($sql);
+
 		#Create the flag file
 		mz_Func::create_installed_flag_file();
 
@@ -87,9 +101,9 @@ class mz_Func
 
 		global $wpdb;
 
-		$groupID = $wpdb->get_row('SELECT DISTINCT groupid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE userid = '.$userID);
+		$groupID = $wpdb->get_row('SELECT DISTINCT groupid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE userid = '.$userID, ARRAY_A);
 
-		return $groupID;
+		return $groupID["groupid"];
 
 	}
 

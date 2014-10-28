@@ -56,7 +56,7 @@ class mz_Groups{
 		         _e( 'Group name saved' );
 		    echo '</p></div><br/>';
 
-			$update = $wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . GROUPS_DB_TABLE . ' SET groupname = %s	WHERE groupid = ' . $groupID, $_POST['mz_group_name'] ) );
+			$wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . GROUPS_DB_TABLE . ' SET groupname = %s	WHERE groupid = ' . $groupID, $_POST['mz_group_name'] ) );
 
 		}
 
@@ -66,7 +66,7 @@ class mz_Groups{
 		echo '<form action="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '" method="post">';
 			echo '<label for="mz_group_name">Group Name</label> ';
 			echo '<input type="text" class="regular-text" id="mz_group_name" name="mz_group_name" value="' . $data['groupname'] . '">';
-			echo '<input type="submit" value="Add New" class="button button-primary"/>';
+			echo '<input type="submit" value="Save" class="button button-primary"/>';
 		echo '</form>';
 
 	}
@@ -79,7 +79,9 @@ class mz_Groups{
 	{
 		global $wpdb;
 
-		$wpdb->delete( $wpdb->query( 'DELETE FROM ' . $wpdb->prefix . GROUPS_DB_TABLE . ' WHERE groupid = ' . $groupID ) );
+        $wpdb->delete( $wpdb->prefix . GROUPS_DB_TABLE, array( 'groupid' => $groupID ) );
+
+        $wpdb->delete( $wpdb->prefix . USER_GROUPS_DB_TABLE, array( 'groupid' => $groupID ) );
 
 		echo '<div class="updated"><p>';
 	         _e( 'Group deleted' );

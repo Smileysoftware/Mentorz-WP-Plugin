@@ -125,7 +125,8 @@ class mz_Users{
 				$out.= '<option>Select</option>';
 				foreach ( $students as $student ) {
 
-					if ( ! in_array( $student->ID , $already ) ){
+                    //Check if the user is already assigned, also only run this is already is set.
+					if ( ! in_array( $student->ID , $already )  && isset( $already ) ){
 						$out.= '<option value="' . $student->ID . '">' . $student->display_name . '</option>';
 					}
 										

@@ -25,7 +25,7 @@ define('PLUGIN_READ_PAGE' , 'inbox/show');
 ################### Ere be dragons! ###############################################################################
 
 
-define('VERSION' , '0.2.0');
+define('VERSION' , '0.2.1');
 
 $log = '
 
@@ -33,7 +33,7 @@ $log = '
 0.1.6 - Plugin groups CRUD<br/>
 0.1.7 - Plugin, assign mentors / users to groups<br/>
 0.2 - Removal off php5.5 type OOP functionality due to using php5.4 on server.<br/>
-0.2.1 - <br/>
+0.2.1 - Creation of the inbox, create and show views.<br/>
 
 ';
 
@@ -44,6 +44,7 @@ define('NO_ACCESS_MESSAGE' , 'You do not have sufficient permissions to access t
 
 define('GROUPS_DB_TABLE' , 'mentorz_groups');
 define('USER_GROUPS_DB_TABLE' , 'mentorz_user_groups');
+define('MESSAGES_DB_TABLE' , 'mentorz_messages');
 
 require_once( CLASSES_DIR . '/' . 'Functions.php');
 require_once( CLASSES_DIR . '/' . 'Mentorz.php');
