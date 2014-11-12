@@ -55,7 +55,7 @@
      */
 	add_role( 'mentor' , "Mentor" , array(
         'read' => true, 'edit_posts' => false, 'delete_posts' => false,  ) );
-	add_role( 'student' , "Student" , array(
+	add_role( 'student' , "Beneficiary" , array(
         'read' => true, 'edit_posts' => false, 'delete_posts' => false,  ) );
 
 //    remove_role( 'mentor' );

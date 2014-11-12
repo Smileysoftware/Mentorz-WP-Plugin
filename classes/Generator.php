@@ -43,8 +43,11 @@ class mz_Generator{
                         echo '
                                     <th>From</th>
                                     <th>Subject</th>
-                                    <th>View</th>
-                                </tr>
+                                    <th>View</th>';
+                        if ( current_user_can( 'manage_options' ) ) {
+                            echo '<th>Delete</th>';
+                        }
+                         echo '       </tr>
                             </thead>
                             <tfoot>
                                 <tr>
@@ -55,7 +58,11 @@ class mz_Generator{
                         echo '
                                     <th>From</th>
                                     <th>Subject</th>
-                                    <th>View</th>
+                                    <th>View</th>';
+                        if ( current_user_can( 'manage_options' ) ) {
+                            echo '<th>Delete</th>';
+                        }
+                        echo '
                                 </tr>
                             </tfoot>';
 
@@ -65,17 +72,16 @@ class mz_Generator{
                             $stamp = date('jS M Y h:i a' , strtotime( $message['stamp'] ) );
 
                             //Get the info about the sender
-                            $user_info = get_userdata( $message['messagefrom'] );
-                            $messagefrom = $user_info->display_name;
+                            $messagefrom = mz_Func::get_users_display_name( $message['messagefrom'] );
 
                             //Get the info about the recipient
                             if ( current_user_can( 'manage_options' ) ) {
-                                $recipient_info = get_userdata( $message['messageto'] );
-                                $messageto = $recipient_info->display_name;
+                                $messageto = mz_Func::get_users_display_name( $message['messageto'] );
                             }
 
-                            //<a href="'.get_site_url().'/'.PLUGIN_READ_PAGE.'&mz_msg='.$message['messageid'].'">View</a>
                             $showURL = add_query_arg( 'mz_msg', $message['messageid'] , get_site_url().'/'.PLUGIN_READ_PAGE. '/' );
+                            $deleteURL = add_query_arg( 'mz_msg_del', $message['messageid'] , get_site_url().'/'.PLUGIN_READ_PAGE. '/' );
+
 
                             echo '
                             <tbody>
@@ -88,8 +94,11 @@ class mz_Generator{
                             echo '
                                  <td>'.$messagefrom.'</td>
                                  <td>'.$message['subject'].'</td>
-                                 <td><a href="'.$showURL.'">View</a></td>
-                               </tr>
+                                 <td><a href="'.$showURL.'">View</a></td>';
+                                 if ( current_user_can( 'manage_options' ) ) {
+                                    echo '<td><a href="'.$deleteURL.'">Delete</a></td>';
+                                }
+                            echo '</tr>
                             </tbody>
                             ';
 
@@ -157,7 +166,7 @@ class mz_Generator{
                         //Do a bit of validation
                         $errors = '';
 
-                        if ( ! $_POST['mz_recipient'] ){
+                        if ( ! isset( $_POST['mz_recipient'] ) ){
 
                             //If the role is student and there is no recipient then something went badly wrong.
                             if ( $userRoles == 'student'){
@@ -216,38 +225,54 @@ class mz_Generator{
 
 
     /**
-     * Function
+     * Function to show the message selected
      */
     public static function mentorz_show_block()
     {
 
-        //First check we have a message to show
-        if ( $_GET['mz_msg'] ){
-
-            $message = mz_Generator::get_message( $_GET['mz_msg'] );
-
-            //Clean up my date
-            $stamp = date('jS M Y h:i a' , strtotime( $message['stamp'] ) );
-
-            //Get the info about the sender
-            $user_info = get_userdata( $message['messagefrom'] );
-            $messagefrom = $user_info->display_name;
-
-            echo '<section class="mz_show_page">';
-
-            echo '<p><strong>Message Sent: </strong>'.$stamp.'</p>';
-            echo '<p><strong>Message From: </strong>'.$messagefrom.'</p>';
-            echo '<p><strong>Subject: </strong>'.$message['subject'].'</p>';
-            echo '<p><strong>Body: </strong>'.$message['body'].'</p>';
-
-            echo '</section>';
-
-
+        //Delete a message if youre an admin
+        if ( current_user_can( 'manage_options' ) && isset( $_GET['mz_msg_del'] ) ) {
+            mz_Func::delete_message( $_GET['mz_msg_del'] );
         } else {
 
-            echo '<h3>No message selected</h3>';
+            //First check we have a message to show
+            if ( isset( $_GET['mz_msg'] ) ){
+
+                $message = mz_Generator::get_message( $_GET['mz_msg'] );
+
+                //Clean up my date
+                $stamp = date('jS M Y h:i a' , strtotime( $message['stamp'] ) );
+
+                //Get the info about the sender
+                $messagefrom = mz_Func::get_users_display_name( $message['messagefrom'] );
+
+                echo '<section class="mz_show_page">';
+
+                $replyURL = add_query_arg( array( 'mz_msg_recipient' => $message['messagefrom'] , 'mz_msg_subject' => $message['subject'] ) , get_site_url().'/'.PLUGIN_CREATE_PAGE. '/' );
+
+                echo '<a href="'.$replyURL.'" class="mz_button">Reply</a>';
+
+
+                echo '<p><strong>Message Sent: </strong>'.$stamp.'</p>';
+                echo '<p><strong>Message From: </strong>'.$messagefrom.'</p>';
+                echo '<p><strong>Subject: </strong>'.$message['subject'].'</p>';
+                echo '<p><strong>Body: </strong>'.$message['body'].'</p>';
+
+                echo '</section>';
+
+
+            } else {
+
+                echo '<h3>No message selected</h3>';
+                echo '<p><a href="'.get_site_url( null , 'inbox' ).'">Go to inbox</a></p>';
+
+            }
 
         }
+
+
+
+
     }
 
 
@@ -291,7 +316,14 @@ class mz_Generator{
 
         $form .= '<div>';
         $form .= '<label>Please enter the subject of your message</label>';
-        $form .= '<input name="mz_subject" type="text"/>';
+
+        //If this is a reply, auto fill the subject
+        if ( $_GET['mz_msg_subject'] ){
+            $form .= '<input name="mz_subject" type="text" value="Re: '.$_GET['mz_msg_subject'].'"/>';
+        } else {
+            $form .= '<input name="mz_subject" type="text"/>';
+        }
+
         $form .= '</div>';
 
         $form .= '<div>';
@@ -318,6 +350,19 @@ class mz_Generator{
     {
         global $wpdb;
 
+        if( isset( $_GET['mz_msg_recipient'] ) ){
+
+            $displayName = mz_Func::get_users_display_name( $_GET['mz_msg_recipient'] );
+
+            $recipientElem = '<div>';
+            $recipientElem .= '<label>Replying to ' . $displayName . '</label>';
+            $recipientElem .= '<input name="mz_recipient" type="hidden" value="'.$_GET['mz_msg_recipient'].'"/>';
+            $recipientElem .= '</div>';
+
+            return $recipientElem;
+
+        }
+
         //Return a select elem
         //Determine if the user is a mentor or student or admin
         if ( $userRoles == 'mentor' ){
@@ -339,8 +384,7 @@ class mz_Generator{
         //A student can only send to their mentor so use this as the deciding factor.
         if ( $userRoles == 'student' ){
 
-            $user_info = get_userdata( $recipients[0]['userid'] );
-            $displayName = $user_info->display_name;
+            $displayName = mz_Func::get_users_display_name( $recipients[0]['userid'] );
 
             //Check to make sure something came back
             if ( $recipients ){
@@ -363,8 +407,7 @@ class mz_Generator{
 
             foreach ( $recipients as $recipient ) {
 
-                $user_info = get_userdata( $recipient['userid'] );
-                $displayName = $user_info->display_name;
+                $displayName = mz_Func::get_users_display_name( $recipient['userid'] );
 
                 $recipientElem .= '<option value="'.$recipient['userid'].'">'.$displayName.'</option>';
 
@@ -397,34 +440,92 @@ class mz_Generator{
 
         $stamp = date('r');
 
+        //Build the email headers
+        $headers[] = 'From: '.EMAIL_FROM_NAME.' <'.EMAIL_FROM_ADDRESS.'>';
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
 
-        $wpdb->insert(
-            $wpdb->prefix . MESSAGES_DB_TABLE,
-            array(
-                'messageto' => $recipient,
-                'messagefrom' => $userID,
-                'subject' => $subject,
-                'body' => $body,
-                'stamp' => $stamp
-            )
-        );
+        //If the recipient is set to 0, then send it to everyone in that group.
+        if ( $recipient == '0' ){
 
+            //Get the group
+            $groupID = mz_Func::get_current_users_group( $userID );
+
+            //Get a list of all the students within this group.
+            $students = mz_Func::get_all_students_in_group( $groupID );
+
+            //Loop through the list and create all the messages.
+            foreach ( $students as $student ) {
+
+                //Create the db record for each student
+                $wpdb->insert(
+                    $wpdb->prefix . MESSAGES_DB_TABLE,
+                    array(
+                        'messageto' => $student['userid'],
+                        'messagefrom' => $userID,
+                        'subject' => $subject,
+                        'body' => $body,
+                        'stamp' => $stamp
+                    )
+                );
+
+                //Email each student
+                $to = mz_Func::get_users_email_address( $student['userid'] );
+
+                $message = mz_Func::build_email_message( $student['userid'] , $userID );
+
+                wp_mail( $to , EMAIL_SUBJECT_LINE , $message , $headers );
+
+            }//end foreach
+
+
+        } else {
+
+            //There is one recipient selected.
+            $wpdb->insert(
+                $wpdb->prefix . MESSAGES_DB_TABLE,
+                array(
+                    'messageto' => $recipient,
+                    'messagefrom' => $userID,
+                    'subject' => $subject,
+                    'body' => $body,
+                    'stamp' => $stamp
+                )
+            );
+
+            //Send the user an email
+            $to = mz_Func::get_users_email_address( $recipient );
+
+            $message = mz_Func::build_email_message( $recipient , $userID );
+
+            wp_mail( $to , EMAIL_SUBJECT_LINE , $message , $headers );
+
+
+        }
+
+
+        //Check to see if a message ID was returned.
         $msgID = $wpdb->insert_id;
 
         if ( $msgID ){
 
             //TODO Notify the user via email that they have a new message
-            return '<p class="mz_success">Your message was sent</p>';
+            echo '<p class="mz_success">Your message was sent</p>';
+            echo '<a href="'.get_site_url().'/'.PLUGIN_ROOT_PAGE.'" class="mz_button">Back to inbox</a>';
+            echo '<a href="'.get_site_url().'/'.PLUGIN_CREATE_PAGE.'" class="mz_button">Send another</a>';
 
         } else {
 
-            return '<p class="mz_failure">Message sending failed</p>';
+            echo '<p class="mz_failure">Message sending failed</p>';
 
         }
 
     }
 
-
+    /**
+     * Get an array of all the messages
+     *
+     * @return mixed
+     */
     private static function get_messages(){
 
         global $wpdb;
@@ -436,12 +537,12 @@ class mz_Generator{
         if ( current_user_can( 'manage_options' ) ){
 
             //Fetch the message for the user
-            $messages = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . MESSAGES_DB_TABLE . ' ORDER BY stamp DESC' , ARRAY_A);
+            $messages = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . MESSAGES_DB_TABLE . ' ORDER BY messageid DESC' , ARRAY_A);
 
         } else {
 
             //Fetch the message for the user
-            $messages = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . MESSAGES_DB_TABLE . ' WHERE  messageto = ' . $userID . ' ORDER BY stamp DESC' , ARRAY_A);
+            $messages = $wpdb->get_results('SELECT * FROM ' . $wpdb->prefix . MESSAGES_DB_TABLE . ' WHERE  messageto = ' . $userID . ' ORDER BY messageid DESC' , ARRAY_A);
 
         }
 
@@ -452,6 +553,12 @@ class mz_Generator{
     }
 
 
+    /**
+     * Get a particular message by its ID
+     *
+     * @param $msgid
+     * @return mixed
+     */
     private static function get_message( $msgid ){
 
         global $wpdb;
@@ -479,5 +586,8 @@ class mz_Generator{
         return $message;
 
     }
+
+
+
 
 }

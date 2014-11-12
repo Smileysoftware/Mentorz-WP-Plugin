@@ -75,7 +75,7 @@ class mz_Pages{
 				</ol>
 
 				<p>
-				These pages can be modified in settings if required.
+				These pages can be modified in settings.php if required.
 				</p>
 
 				<h3>Users</h3>
@@ -92,11 +92,16 @@ class mz_Pages{
 
 				<p>The following tags are designed to be placed inside the WordPress page content area</p>
 
-				<p><input value="[mentorz_inbox]"> can be placed in the page to generate the inbox view. Pages must be /inbox</p>
+				<p><input value="[mentorz_inbox]"> can be placed in the page to generate the inbox view. Pages must be /inbox (Or defined above)</p>
 
-				<p><input value="[mentorz_create]"> can be placed in the page to generate the message creation form. Page must be /inbox/create</p>
+				<p><input value="[mentorz_create]"> can be placed in the page to generate the message creation form. Page must be /inbox/create (Or defined above)</p>
 
-				<p><input value="[mentorz_show]"> can be placed in the page to generate the message view. Page must be /inbox/show</p>
+				<p><input value="[mentorz_show]"> can be placed in the page to generate the message view. Page must be /inbox/show (Or defined above)</p>
+
+				<h3>Emails</h3>
+				<p>When a message is generated the system will email the relevant user to notify them of the message</p>
+				<p>The message content is NOT emailed for security reasons.</p>
+				<p>The email details can be modified in settings.php</p>
 
 			</div>
 
@@ -144,10 +149,12 @@ class mz_Pages{
 			echo '<thead>';
 				echo '<tr>';
 					echo '<th class="column-title"><span>Group Name</span></th>';
-					echo '<th class="column-title">Group Active</th>';
+					//echo '<th class="column-title">Group Active</th>';
 					echo '<th class="column-title">Edit</th>';
 					echo '<th class="column-title">Delete</th>';
-				echo '</tr>';
+                    echo '<th class="column-title">Info</th>';
+
+            echo '</tr>';
 			echo '</thead>';
 
 			foreach ($results as $key => $value) {
@@ -163,14 +170,57 @@ class mz_Pages{
 				echo '<tbody>';
 					echo '<tr>';
 						echo '<td>' . $value['groupname'] . '</td>';
-						echo '<td>' . $status . '</td>';
+						//echo '<td>' . $status . '</td>';
 						echo '<td style="width: 30px;">';
 							echo '<a href="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '&edit='.$value['groupid'].'" class="">EDIT</a>';
 						echo '</td>';
 						echo '<td style="width: 30px;">';
 							echo '<a href="' . str_replace( '%7E', '~', $_SERVER['REQUEST_URI']) . '&del='.$value['groupid'].'" class="">DELETE</a>';
 						echo '</td>';
-					echo '<tr>';
+                        echo '<td style="width: 30px;">';
+                            echo '<a href="#" class="mz_accordion_button" rel="mz_accord_'.$value['groupid'].'">INFO</a>';
+                        echo '</td>';
+					echo '</tr>';
+
+                    echo '<tr class="mz_accord mz_accord_'.$value['groupid'].'_inner">';
+                        echo '<td style="width: 30px;" colspan="99">';
+                        echo '<div>';
+
+                            $mentor = mz_Func::get_group_mentor( $value['groupid'] );
+
+                            if (  $mentor ){
+                                echo '<h4>The group mentor is ' . mz_Func::get_group_mentor( $value['groupid'] ) . '</h4>';
+                            } else {
+                                echo '<h4>The group does not have a mentor</h4>';
+                            }
+
+                            $students = mz_func::get_all_students_in_group( $value['groupid'] );
+
+                            if (  $students ){
+
+                                echo '<h4>The groups beneficiaries are</h4>';
+                                echo '<ul>';
+
+                                foreach ( $students as $student ) {
+
+                                    echo '<li>'.mz_Func::get_users_display_name( $student['userid'] ).'</li>';
+
+                                }
+
+                                echo '</ul>';
+
+                            } else {
+
+                                echo '<h4>The group does not have any beneficiaries</h4>';
+
+                            }
+
+
+
+                echo '</div>';
+                        echo '</td>';
+                    echo '</tr>';
+
 				echo '</tbody>';
 
 
@@ -214,11 +264,11 @@ class mz_Pages{
             //A new mentor has been setup
             if ( mz_Users::updateUser( $_POST['groupID'] , $_POST['userID'] ) ){
                 echo '<div class="updated"><p>';
-                _e( 'Student added to group' );
+                _e( 'Beneficiary added to group' );
                 echo '</p></div><br/>';
             } else {
                 echo '<div class="error"><p>';
-                _e( 'Student not added to group' );
+                _e( 'Beneficiary not added to group' );
                 echo '</p></div><br/>';
             }
         }

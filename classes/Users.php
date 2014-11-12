@@ -18,8 +18,8 @@ class mz_Users{
 
         //If there is a mentor set then get their name and show it.
         if ( $the_mentor ){
-            $user_info = get_userdata( $the_mentor->userid );
-            echo '<h4>The current mentor is ' . $user_info->user_login . ' </h4>';
+            $display_name = mz_Func::get_users_display_name( $the_mentor->userid );
+            echo '<h4>The current mentor is ' . $display_name . ' </h4>';
         } else {
             echo '<h4>There is no mentor set for this group</h4>';
         }
