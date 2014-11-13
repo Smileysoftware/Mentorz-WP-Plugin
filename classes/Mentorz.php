@@ -107,5 +107,45 @@
     }
 
 
+    /**
+     * If users have been deleted remove them from the user group table
+     */
+    add_action('init','clean_up_users');
+    function clean_up_users() {
+
+        global $wpdb;
+
+        //Get a list of all the users in the plugin
+        $plugin_users = $wpdb->get_results( 'SELECT DISTINCT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE  , ARRAY_A );
+
+        //Check they exist
+        foreach ( $plugin_users as $plugin_user ) {
+
+            //Check the user exists by trying to get their display name
+            $user_detail = get_userdata( $plugin_user['userid'] );
+
+            if ( ! $user_detail ){
+
+                //Remove the user from the group user link table.
+                remove_user( $plugin_user['userid'] );
+            }
+
+        }
+
+    }
+
+
+    /**
+     * Function deleted the specified user from the user/group link table
+     *
+     * @param $userid
+     */
+    function remove_user( $userid ){
+
+        global $wpdb;
+
+        $wpdb->delete( $wpdb->prefix . USER_GROUPS_DB_TABLE , array( 'userid' => $userid ) );
+
+    }
 
 

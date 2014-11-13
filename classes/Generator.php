@@ -318,7 +318,7 @@ class mz_Generator{
         $form .= '<label>Please enter the subject of your message</label>';
 
         //If this is a reply, auto fill the subject
-        if ( $_GET['mz_msg_subject'] ){
+        if ( isset ( $_GET['mz_msg_subject'] ) ){
             $form .= '<input name="mz_subject" type="text" value="Re: '.$_GET['mz_msg_subject'].'"/>';
         } else {
             $form .= '<input name="mz_subject" type="text"/>';
@@ -386,17 +386,23 @@ class mz_Generator{
 
             $displayName = mz_Func::get_users_display_name( $recipients[0]['userid'] );
 
-            //Check to make sure something came back
-            if ( $recipients ){
-                $recipientElem = '<div>';
-                $recipientElem .= '<label>Sending your message to ' . $displayName . '</label>';
-                $recipientElem .= '<input name="mz_recipient" type="hidden" value="'.$recipients[0]['userid'].'"/>';
-                $recipientElem .= '</div>';
-            } else {
-                $recipientElem = '<div>';
-                $recipientElem .= '<label>It appears that no mentors are defined</label>';
-                $recipientElem .= '</div>';
-            }
+            //Sometimes if a user is deleted then an empty row will show in the select. This is bad.
+            if ( $displayName  ) {
+
+                //Check to make sure something came back
+                if( $recipients ) {
+                    $recipientElem = '<div>';
+                    $recipientElem .= '<label>Sending your message to ' . $displayName . '</label>';
+                    $recipientElem .= '<input name="mz_recipient" type="hidden" value="' . $recipients[ 0 ][ 'userid' ] . '"/>';
+                    $recipientElem .= '</div>';
+                }
+                else {
+                    $recipientElem = '<div>';
+                    $recipientElem .= '<label>It appears that no mentors are defined</label>';
+                    $recipientElem .= '</div>';
+                }
+
+            }//IF
 
 
 
@@ -409,7 +415,12 @@ class mz_Generator{
 
                 $displayName = mz_Func::get_users_display_name( $recipient['userid'] );
 
-                $recipientElem .= '<option value="'.$recipient['userid'].'">'.$displayName.'</option>';
+                //Sometimes if a user is deleted then an empty row will show in the select. This is bad.
+                if ( $displayName  ){
+                    $recipientElem .= '<option value="'.$recipient['userid'].'">'.$displayName.'</option>';
+                }//if
+
+
 
             }
 
@@ -448,10 +459,10 @@ class mz_Generator{
         if ( $recipient == '0' ){
 
             //Get the group
-            $groupID = mz_Func::get_current_users_group( $userID );
+            //$groupID = mz_Func::get_current_users_group( $userID );
 
             //Get a list of all the students within this group.
-            $students = mz_Func::get_all_students_in_group( $groupID );
+            $students = mz_Func::get_all_students_in_group( null );
 
             //Loop through the list and create all the messages.
             foreach ( $students as $student ) {

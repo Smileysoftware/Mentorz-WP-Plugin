@@ -48,7 +48,7 @@ define('PLUGIN_READ_PAGE' , 'inbox/show');
 ################### Ere be dragons! ###############################################################################
 
 
-define('VERSION' , '1.0.0');
+define('VERSION' , '1.0.3');
 
 $log = '
 
@@ -66,6 +66,9 @@ $log = '
 0.3.2 - After message sending, two new links to inbox or create new message.<br/>
 0.4.0 - Users have the ability to reply to messages.<br/>
 1.0.0 - More detail supplied on groups page in admin.<br/>
+1.0.1 - Bug fix to remove users if they have been deleted.<br/>
+1.0.2 - Any users that do not exist are automaitcally removed from the plugin.<br/>
+1.0.3 - Issue when admin tried to send to all. If admin is not part of a group it failed.<br/>
 ';
 
 define('VERSION_LOG' , $log);

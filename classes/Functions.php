@@ -138,11 +138,19 @@ class mz_Func
      * @param $groupID
      * @return mixed
      */
-    public static function get_all_students_in_group( $groupID ){
+    public static function get_all_students_in_group( $groupID = null ){
 
         global $wpdb;
 
-        $students = $wpdb->get_results( 'SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE groupID = '.$groupID . ' AND mentor = 0', ARRAY_A );
+        //If groupID is not supplied then it must be an admin so allow it to get every single user, not just students.
+        if ( $groupID ){
+            $students = $wpdb->get_results( 'SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE groupID = '.$groupID . ' AND mentor = 0', ARRAY_A );
+        } else {
+            //This must be an admin.
+            $students = $wpdb->get_results( 'SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE , ARRAY_A );
+        }
+
+
 
         return $students;
 
@@ -173,9 +181,21 @@ class mz_Func
     public static function get_users_display_name( $userID ){
 
         $user_info = get_userdata( $userID );
-        $display_name = $user_info->display_name;
 
-        return $display_name;
+        if ( $user_info ) {
+
+            $display_name = $user_info->display_name;
+
+            if ( isset( $display_name ) ){
+                return $display_name;
+            } else {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+
     }
 
 
