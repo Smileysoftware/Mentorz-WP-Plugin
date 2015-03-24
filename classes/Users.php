@@ -102,7 +102,7 @@ class mz_Users{
 
 	/**
 	 * This method displays the form to add a new user to a group.
-	 * The list should only show users that are not already memebers of the group
+	 * The list should only show users that are not already members of the group
 	 */
 	public static function usersForm( $groupID )
 	{
@@ -113,8 +113,9 @@ class mz_Users{
 		$students = get_users( 'orderby=nicename&role=student' );
 
 		//Some way to resrtict the select to a list of people not already in the group.
-		//$alreadyMembers = $wpdb->get_results('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE groupid = ' . $groupID . ' and mentor != 1', ARRAY_A);
 		$alreadyMembers = $wpdb->get_results('SELECT userid FROM ' . $wpdb->prefix . USER_GROUPS_DB_TABLE . ' WHERE  mentor != 1', ARRAY_A);
+
+		$already = []; //Set to an empty array just in case it doesn't get filled
 		foreach ($alreadyMembers as $member) {
 			$already[] = $member['userid'];
 		}
@@ -126,9 +127,9 @@ class mz_Users{
 				foreach ( $students as $student ) {
 
                     //Check if the user is already assigned, also only run this is already is set.
-					if ( ! in_array( $student->ID , $already )  && isset( $already ) ){
-						$out.= '<option value="' . $student->ID . '">' . $student->display_name . '</option>';
-					}
+						if ( ! in_array( $student->ID, $already ) ) {
+							$out .= '<option value="' . $student->ID . '">' . $student->display_name . '</option>';
+						}
 										
 				}
 			$out.= '</select>';
