@@ -48,7 +48,7 @@ define('PLUGIN_READ_PAGE' , 'inbox/show');
 ################### Ere be dragons! ###############################################################################
 
 
-define('VERSION' , '1.0.3');
+define('VERSION' , '1.0.4');
 
 $log = '
 
@@ -69,6 +69,7 @@ $log = '
 1.0.1 - Bug fix to remove users if they have been deleted.<br/>
 1.0.2 - Any users that do not exist are automaitcally removed from the plugin.<br/>
 1.0.3 - Issue when admin tried to send to all. If admin is not part of a group it failed.<br/>
+1.0.4 - Bug fix when adding users and checking if they already exist.<br/>
 ';
 
 define('VERSION_LOG' , $log);
